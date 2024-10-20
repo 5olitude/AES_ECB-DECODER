@@ -37,7 +37,8 @@ ECB is one of the simplest block cipher modes of operation. In ECB mode:
 1. **Plaintext** is divided into 16-byte blocks.  
 2. **Each block** is independently encrypted using AES and the same key.
 3. The **resulting ciphertext** blocks are concatenated.
-![Wikipedia ECB Penguin Image](https://upload.wikimedia.org/wikipedia/commons/d/d6/ECB_encryption.svg)
+
+   ![Wikipedia ECB Penguin Image](https://upload.wikimedia.org/wikipedia/commons/d/d6/ECB_encryption.svg)
 ---
 
 ## **Real-World Example: ECB Penguin Attack**
