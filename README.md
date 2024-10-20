@@ -82,16 +82,25 @@ func main() {
 	colors_needed := 254
 	flip := true
 	pix_width := 16
+        
+	image_location := "aes.bmp"  //please specify the path of the image you wanna decrypt
+	block_size := 16    //the block size in ecb mode as we learned 16 bytes
 
-	image_location := "aes.bmp"
-	block_size := 16
 
+        //Redaing the image as bytes 
 	bytes, err := os.ReadFile(image_location)
 	if err != nil {
 		log.Fatalf("Failed to read input file: %v", err)
 	}
 
-	bytes = bytes[:len(bytes)-(len(bytes)%block_size)]
+
+       //Adjusts the byte slice to remove any remaining bytes that do not form a complete block of size
+       //block_size (i.e., 16 bytes). This ensures that only full blocks are processed.
+
+	bytes = bytes[:len(bytes)-(len(bytes)%block_size)] 
+
+
+      // Creates a slice of byte slices (blocks) to hold the individual 16-byte blocks. It loops through the bytes slice, slicing it into blocks and appending each          block to blocks.
 
 	blocks := make([][]byte, 0)
 	for i := 0; i < len(bytes); i += block_size {
@@ -99,29 +108,40 @@ func main() {
 		blocks = append(blocks, block)
 	}
 
+        // initializes a map block_counts to keep track of how many times each block appears. It iterates over the blocks, converting each block to a string key and incrementing its count in the map.
+
 	block_counts := make(map[string]int)
 	for _, block := range blocks {
 		blockKey := string(block)
 		block_counts[blockKey]++
 	}
 
+       // Defines a struct BlockFrequencifier to hold a block's key and its frequency count.
 	type BlockFrequencifier struct {
 		BlockKey string
 		Count    int
 	}
 
+       // Initializes a slice block_frequencies to hold the frequency of each block. It iterates over block_counts, creating an instance of BlockFrequencifier for          // each block and appending it to block_frequencies
+
 	block_frequencies := make([]BlockFrequencifier, 0, len(block_counts))
 	for k, v := range block_counts {
 		block_frequencies = append(block_frequencies, BlockFrequencifier{BlockKey: k, Count: v})
 	}
+
+
+        //Sorts the block_frequencies slice in descending order based on the Count field. This helps prioritize the most frequent blocks.
 	sort.Slice(block_frequencies, func(i, j int) bool {
 		return block_frequencies[i].Count > block_frequencies[j].Count
 	})
 
+
+       //Initializes a colorMap to associate block strings with colors. Also, it creates a palette slice to hold the colors, starting with white as the first color.
 	colorMap := make(map[string]color.Color)
 	palette := make([]color.Color, 0, colors_needed)
 	palette = append(palette, color.White) // First color is white
 
+       //This loop generates a color palette with the specified number of colors. Each color is generated with varying values for red, green, and blue components,         //ensuring diversity. Finally, black is added as the last color.
 	for i := 1; i < colors_needed-1; i++ {
 
 		clr := color.RGBA{
